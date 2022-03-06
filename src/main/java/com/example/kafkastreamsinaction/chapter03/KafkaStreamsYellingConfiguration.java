@@ -11,6 +11,11 @@ import java.util.function.Consumer;
 @Configuration
 public class KafkaStreamsYellingConfiguration {
 
+    /**
+     * spring-cloud-stream-binder-kafka에서 지원하는 Programming Model중 Functional Style 기반으로 KStream Application 등록
+     * https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_functional_style
+     * @return
+     */
     @Bean
     public Consumer<KStream<String, String>> kafkaStreamsYellingApp() {
         return input -> {

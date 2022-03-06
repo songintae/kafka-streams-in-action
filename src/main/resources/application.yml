@@ -1,8 +1,10 @@
 spring:
   kafka:
+    # Streams ????? bootstrap-servers ??? ?? ???? ?? spring.kafka.bootstrap-servers? ????.
+    # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_setting_up_bootstrap_server_configuration
     bootstrap-servers: localhost:9092
-    consumer:
-      auto-offset-reset: latest
+  # Multiple Kafka Streams processors? ??? ??? Application?? ?? ??? ???? ??? ??? ?????.
+  # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_multiple_kafka_streams_processors_within_a_single_application
   cloud:
     stream:
       function:
