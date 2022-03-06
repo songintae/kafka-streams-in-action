@@ -1,0 +1,23 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: latest
+  cloud:
+    stream:
+      function:
+        definition: kafkaStreamsYellingApp
+      bindings:
+        kafkaStreamsYellingApp-in-0:
+          destination: src-topic
+      kafka:
+        streams:
+          binder:
+            functions:
+              kafkaStreamsYellingApp:
+                applicationId: kafkaStreamsYellingApp
+          bindings:
+            kafkaStreamsYellingApp-in-0:
+              consumer:
+                keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
