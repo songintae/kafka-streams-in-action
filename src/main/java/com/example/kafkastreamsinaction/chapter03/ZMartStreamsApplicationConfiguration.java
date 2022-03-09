@@ -3,6 +3,7 @@ package com.example.kafkastreamsinaction.chapter03;
 import com.example.kafkastreamsinaction.model.Purchase;
 import com.example.kafkastreamsinaction.model.PurchasePattern;
 import com.example.kafkastreamsinaction.model.RewardAccumulator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.KStream;
@@ -13,6 +14,7 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 
 import java.util.function.Consumer;
 
+@Slf4j
 @Configuration
 public class ZMartStreamsApplicationConfiguration {
 
@@ -29,13 +31,17 @@ public class ZMartStreamsApplicationConfiguration {
 
             purchaseKStream
                     .mapValues(purchase -> PurchasePattern.builder(purchase).build())
+                    .peek((key, value) -> log.info("[pattern] key {}, value: {}", key, value))
                     .to("patterns", Produced.with(stringSerde, purchasePatternSerde));
 
             purchaseKStream
                     .mapValues(purchase -> RewardAccumulator.builder(purchase).build())
+                    .peek((key, value) -> log.info("[rewards] key {}, value: {}", key, value))
                     .to("rewards", Produced.with(stringSerde, rewardAccumulatorSerde));
 
-            purchaseKStream.to("purchases", Produced.with(stringSerde, purchaseSerde));
+            purchaseKStream
+                    .peek((key, value) -> log.info("[purchases] key {}, value: {}", key, value))
+                    .to("purchases", Produced.with(stringSerde, purchaseSerde));
         };
     }
 

@@ -39,6 +39,9 @@ public class Purchase {
     private String zipCode;
     private String storeId;
 
+    private Purchase() {
+    }
+
     private Purchase(Builder builder) {
         firstName = builder.firstName;
         lastName = builder.lastName;

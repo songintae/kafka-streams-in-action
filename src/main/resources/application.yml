@@ -3,6 +3,14 @@ spring:
     # Streams ????? bootstrap-servers ??? ?? ???? ?? spring.kafka.bootstrap-servers? ????.
     # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_setting_up_bootstrap_server_configuration
     bootstrap-servers: localhost:9092
+    producer:
+      acks: 1
+      batch-size: 1000000
+      key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        linger.ms: 100
+
   # Multiple Kafka Streams processors? ??? ??? Application?? ?? ??? ???? ??? ??? ?????.
   # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_multiple_kafka_streams_processors_within_a_single_application
   cloud:
@@ -12,8 +20,6 @@ spring:
       bindings:
         kafkaStreamsYellingApp-in-0:
           destination: src-topic
-          consumer:
-            naticeDecoding: false
         zMartStreamApplication-in-0:
           destination: transaction
       kafka:
@@ -33,5 +39,4 @@ spring:
               consumer:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-
 
