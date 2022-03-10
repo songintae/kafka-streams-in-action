@@ -18,6 +18,9 @@ spring:
       function:
         definition: kafkaStreamsYellingApp;zMartStreamApplication
       bindings:
+        # KafkaStreams Bindings inbound consumer에 useNativeDecoding을 사용할떄 주의해야한다. useNativeDecoding: false로 선언시 설정한 Serde와 관계 없이 ByteArraySerde를 사용하게 된다.
+        # KeyValueSerdeResolver.getInboundValueSerde에서 확인 가능
+        # KStreamBoundElementFactory.createInput 에서 Default를 true로 설정해준다.
         kafkaStreamsYellingApp-in-0:
           destination: src-topic
         zMartStreamApplication-in-0:
@@ -33,10 +36,15 @@ spring:
             configuration:
               default:
                 key.serde: org.springframework.kafka.support.serializer.JsonSerde
+                # default.value.serde는 useNativeDecoding = true && Bindings에 valueSerde에 설정이 되어있지 않을 경우에만 동작한다
                 value.serde: org.springframework.kafka.support.serializer.JsonSerde
           bindings:
             kafkaStreamsYellingApp-in-0:
               consumer:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            zMartStreamApplication-in-0:
+              consumer:
+                keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                valueSerde: com.example.kafkastreamsinaction.serde.PurchaseSerde
 
