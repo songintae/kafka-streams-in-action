@@ -23,8 +23,12 @@ spring:
         # KStreamBoundElementFactory.createInput 에서 Default를 true로 설정해준다.
         kafkaStreamsYellingApp-in-0:
           destination: src-topic
+          consumer:
+            concurrency: 1
         zMartStreamApplication-in-0:
           destination: transaction
+          consumer:
+            concurrency: 1
       kafka:
         streams:
           binder:
@@ -34,6 +38,7 @@ spring:
               zMartStreamApplication:
                 applicationId: zMartStreamApplication
             configuration:
+              replication.factor: 3
               default:
                 key.serde: org.springframework.kafka.support.serializer.JsonSerde
                 # default.value.serde는 useNativeDecoding = true && Bindings에 valueSerde에 설정이 되어있지 않을 경우에만 동작한다
