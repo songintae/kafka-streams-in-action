@@ -1,6 +1,6 @@
 spring:
   kafka:
-    # Streams ????? bootstrap-servers ??? ?? ???? ?? spring.kafka.bootstrap-servers? ????.
+    # Kafka Streams Binder에서는 두가지 Level에서 Kafka Broker를 등록할 수 있다. 카프카 브로커는 카프카를 사용하는 다양한 곳에서 사용되기 때문에 Boot Property Level에 설정하고 사용한다.
     # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_setting_up_bootstrap_server_configuration
     bootstrap-servers: localhost:9092
     producer:
@@ -11,8 +11,8 @@ spring:
       properties:
         linger.ms: 100
 
-  # Multiple Kafka Streams processors? ??? ??? Application?? ?? ??? ???? ??? ??? ?????.
-  # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_multiple_kafka_streams_processors_within_a_single_application
+  # Kafka Streams Binder에서는 Functional Style, mperative programming model 두가지 방식의 스트림 프로세서 Binder 기능을 제공한다.
+  # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_programming_model
   cloud:
     stream:
       function:
@@ -45,6 +45,10 @@ spring:
                 key.serde: org.springframework.kafka.support.serializer.JsonSerde
                 # default.value.serde는 useNativeDecoding = true && Bindings에 valueSerde에 설정이 되어있지 않을 경우에만 동작한다
                 value.serde: org.springframework.kafka.support.serializer.JsonSerde
+            # Kafka Streams Binder는 input binder에서 에러가 발생할 떄 어떻게 처리할지에 대한 exception handler를 설정할 수 있다.
+            # 해당 설정은 Application에 존재하는 모든 Stream Processor 에 적용되기 때문에 개별적으로 설정이 필요한 경우 따로 설정을 주어야한다.
+            # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_error_handling
+            deserialization-exception-handler: logandfail
           bindings:
             kafkaStreamsYellingApp-in-0:
               consumer:
