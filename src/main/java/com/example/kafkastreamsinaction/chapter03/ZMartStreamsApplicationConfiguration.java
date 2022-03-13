@@ -6,12 +6,17 @@ import com.example.kafkastreamsinaction.model.RewardAccumulator;
 import com.example.kafkastreamsinaction.serde.PurchasePatternSerde;
 import com.example.kafkastreamsinaction.serde.PurchaseSerde;
 import com.example.kafkastreamsinaction.serde.RewardAccumulatorSerde;
+import com.example.kafkastreamsinaction.transformer.PurchaseRewardTransformer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.Repartitioned;
+import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.StoreBuilder;
+import org.apache.kafka.streams.state.Stores;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,6 +30,8 @@ public class ZMartStreamsApplicationConfiguration {
     private static final Serde<PurchasePattern> purchasePatternSerde = new PurchasePatternSerde();
     private static final Serde<RewardAccumulator> rewardAccumulatorSerde = new RewardAccumulatorSerde();
 
+    private static final String REWARD_STATE_STORE = "reward-state-store";
+
     @Bean
     public Consumer<KStream<String, Purchase>> zMartStreamApplication() {
         return input -> {
@@ -37,7 +44,14 @@ public class ZMartStreamsApplicationConfiguration {
                     .to("patterns", Produced.with(Serdes.String(), purchasePatternSerde));
 
             purchaseKStream
-                    .mapValues(purchase -> RewardAccumulator.builder(purchase).build())
+                    /**
+                     * repartition() 기능을 활용하여 파티션을 재조정한다.
+                     * 내부에서 자동으로 해당 스트림만 사용하는 Repartion Topic을 생성해준다. (기존 Topic의 파티션 개수를 따라감)
+                     * 토픽 명은 {applicationId}-<name>-repartition 규칙을 따르며 Repartitioned.as(name)을 사용하여 변경할 수 있다.
+                     */
+                    .repartition(Repartitioned.with(Serdes.String(), purchaseSerde)
+                            .withStreamPartitioner(((topic, key, value, numPartitions) -> value.getCustomerId().hashCode() % numPartitions)))
+                    .transformValues(() -> new PurchaseRewardTransformer(REWARD_STATE_STORE), REWARD_STATE_STORE)
                     .peek((key, value) -> log.info("[rewards] key {}, value: {}", key, value))
                     .to("rewards", Produced.with(Serdes.String(), rewardAccumulatorSerde));
 
@@ -68,10 +82,37 @@ public class ZMartStreamsApplicationConfiguration {
 
 
             purchaseKStream.split()
-                    .branch((key, value) -> value.getDepartment().equals("coffee"), Branched.withConsumer(kStream -> kStream.to("coffee")))
-                    .branch((key, value) -> value.getDepartment().equals("electronics"), Branched.withConsumer(kStream -> kStream.to("electronics")))
+                    .branch((key, value) -> value.getDepartment().equals("Coffee"), Branched.withConsumer(kStream -> kStream.to("coffee")))
+                    .branch((key, value) -> value.getDepartment().equals("Electronics"), Branched.withConsumer(kStream -> kStream.to("electronics")))
                     .noDefaultBranch();
         };
+    }
+
+    /**
+     * ValueTransformerSupplier에서 ConnectedStoreProvider를 통해서도 StateStore를 등록할 수 있다.
+     * 이번 예제에서는 스프링에서 사용하는 Bean 방식의 StateStore 등록방식을 사용한다.
+     * https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_state_store
+     *
+     * @return
+     */
+    @Bean
+    public StoreBuilder<KeyValueStore<String, Integer>> rewardsPointStore() {
+        StoreBuilder<KeyValueStore<String, Integer>> stateStoreBuilder = Stores.keyValueStoreBuilder(
+                Stores.inMemoryKeyValueStore(REWARD_STATE_STORE),
+                Serdes.String(),
+                Serdes.Integer()
+        );
+
+        /**
+         * StateStore의 Chang Log Topic의 설정은 다음과 같이 변경할 수 있다.
+         * Change Log Topic의 크기를 10G, 보존 기간을 2일로 설정
+         */
+//        Map<String, String> changeLogConfigs = new HashMap<>();
+//        changeLogConfigs.put("retention.ms", "172800000");
+//        changeLogConfigs.put("retention.bytes", "10000000000");
+
+//        stateStoreBuilder.withLoggingEnabled(changeLogConfigs);
+        return stateStoreBuilder;
     }
 
 }
