@@ -13,7 +13,6 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.Repartitioned;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
@@ -48,9 +47,15 @@ public class ZMartStreamsApplicationConfiguration {
                      * repartition() 기능을 활용하여 파티션을 재조정한다.
                      * 내부에서 자동으로 해당 스트림만 사용하는 Repartion Topic을 생성해준다. (기존 Topic의 파티션 개수를 따라감)
                      * 토픽 명은 {applicationId}-<name>-repartition 규칙을 따르며 Repartitioned.as(name)을 사용하여 변경할 수 있다.
+                     * repartition은 key가 있는 스트림(Record)에 대해서만 동작한다. KStreamImpl.createRepartitionedSource 에서 NullKeyFilter를 적용했기 떄문에 동작하지 않는다.
                      */
-                    .repartition(Repartitioned.with(Serdes.String(), purchaseSerde)
-                            .withStreamPartitioner(((topic, key, value, numPartitions) -> value.getCustomerId().hashCode() % numPartitions)))
+//                    .map(((key, value) -> new KeyValue<>(value.getCustomerId(), value)))
+//                    .repartition(Repartitioned.with(Serdes.String(), purchaseSerde)
+//                            .withStreamPartitioner(((topic, key, value, numPartitions) -> value.getCustomerId().hashCode() % numPartitions)))
+                    /**
+                     * 예제코드 작성을 위해 through를 사용하여 Repartition 진행. repartition() 메서드는 Key가 존재하는 스트림(Record)에 대해서만 정상 동작한다.
+                     */
+                    .through("customer_transactions", Produced.with(Serdes.String(), purchaseSerde, ((topic, key, value, numPartitions) -> value.getCustomerId().hashCode() % numPartitions)))
                     .transformValues(() -> new PurchaseRewardTransformer(REWARD_STATE_STORE), REWARD_STATE_STORE)
                     .peek((key, value) -> log.info("[rewards] key {}, value: {}", key, value))
                     .to("rewards", Produced.with(Serdes.String(), rewardAccumulatorSerde));
