@@ -25,6 +25,10 @@ public class ZMartStreamsJoinsApplicationConfiguration {
 
     private static final Serde<Purchase> purchaseSerde = new PurchaseSerde();
 
+    /**
+     * Multiple Input Bindings:
+     * https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_multiple_input_bindings
+     */
     @Bean
     public BiConsumer<KStream<String, Purchase>, KStream<String, Purchase>> zMartStreamsJoinsApplication() {
         return (coffeeStream, electionStream) -> {
@@ -39,6 +43,10 @@ public class ZMartStreamsJoinsApplicationConfiguration {
         };
     }
 
+    /**
+     * Timestamp extractor:
+     * https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_timestamp_extractor
+     */
     @Bean
     public TransactionTimestampExtractor transactionTimestampExtractor() {
         return new TransactionTimestampExtractor();
