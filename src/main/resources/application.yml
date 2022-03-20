@@ -80,3 +80,8 @@ spring:
                 valueSerde: com.example.kafkastreamsinaction.serde.PurchaseSerde
                 timestampExtractorBeanName: transactionTimestampExtractor
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: kafkastreamstopology,bindings,metrics
