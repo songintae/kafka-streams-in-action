@@ -5,6 +5,7 @@ import com.example.kafkastreamsinaction.joiner.PurchaseJoiner;
 import com.example.kafkastreamsinaction.model.CorrelatedPurchase;
 import com.example.kafkastreamsinaction.model.Purchase;
 import com.example.kafkastreamsinaction.serde.PurchaseSerde;
+import com.example.kafkastreamsinaction.timestamp.TransactionTimestampExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -36,6 +37,11 @@ public class ZMartStreamsJoinsApplicationConfiguration {
             joinStream.print(Printed.<String, CorrelatedPurchase>toSysOut()
                     .withLabel("[JoinedStream]"));
         };
+    }
+
+    @Bean
+    public TransactionTimestampExtractor transactionTimestampExtractor() {
+        return new TransactionTimestampExtractor();
     }
 
 }

@@ -73,8 +73,10 @@ spring:
               consumer:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: com.example.kafkastreamsinaction.serde.PurchaseSerde
+                timestampExtractorBeanName: transactionTimestampExtractor
             zMartStreamsJoinsApplication-in-1:
               consumer:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: com.example.kafkastreamsinaction.serde.PurchaseSerde
+                timestampExtractorBeanName: transactionTimestampExtractor
 
