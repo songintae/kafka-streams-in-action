@@ -1,4 +1,4 @@
-package com.example.kafkastreamsinaction.chapter03;
+package com.example.kafkastreamsinaction.streams;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.kstream.KStream;

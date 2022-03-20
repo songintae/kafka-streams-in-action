@@ -1,4 +1,4 @@
-package com.example.kafkastreamsinaction.chapter03;
+package com.example.kafkastreamsinaction.streams;
 
 import com.example.kafkastreamsinaction.model.Purchase;
 import com.example.kafkastreamsinaction.model.PurchasePattern;
@@ -86,7 +86,7 @@ public class ZMartStreamsApplicationConfiguration {
 //                    .noDefaultBranch();
 
 
-            purchaseKStream.split()
+            purchaseKStream.selectKey((key, value) -> value.getCustomerId()).split()
                     .branch((key, value) -> value.getDepartment().equals("Coffee"), Branched.withConsumer(kStream -> kStream.to("coffee")))
                     .branch((key, value) -> value.getDepartment().equals("Electronics"), Branched.withConsumer(kStream -> kStream.to("electronics")))
                     .noDefaultBranch();

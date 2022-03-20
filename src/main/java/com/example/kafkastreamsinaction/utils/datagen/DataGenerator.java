@@ -73,6 +73,30 @@ public class DataGenerator {
         return generatePurchases(1, 1).get(0);
     }
 
+    public static Purchase generateElectronicPurchase(String customerId) {
+        Random random = new Random();
+        Faker faker = new Faker();
+
+        String itemPurchased = faker.commerce().productName();
+        int quantity = faker.number().numberBetween(1, 5);
+        double price = Double.parseDouble(faker.commerce().price(4.00, 295.00));
+        Date purchaseDate = timestampGenerator.get();
+
+        Customer customer = generateCustomer(customerId);
+        Store store = electronicStore();
+
+        return Purchase.builder().creditCardNumber(customer.creditCardNumber).customerId(customer.customerId)
+                .department(store.department).employeeId(store.employeeId).firstName(customer.firstName)
+                .lastName(customer.lastName).itemPurchased(itemPurchased).quanity(quantity).price(price).purchaseDate(purchaseDate)
+                .zipCode(store.zipCode).storeId(store.storeId).build();
+
+    }
+
+    public static Purchase generateCoffeePurchase(String customerId) {
+        Purchase purchase = generateElectronicPurchase(customerId);
+        return generateCafePurchase(purchase, new Faker());
+    }
+
     public static List<Purchase> generatePurchases(int number, int numberCustomers) {
         List<Purchase> purchases = new ArrayList<>();
 
@@ -232,6 +256,13 @@ public class DataGenerator {
 
     }
 
+    public static Customer generateCustomer(String customerId) {
+        Faker faker = new Faker();
+        String creditCard = generateCreditCardNumbers(1).get(0);
+        Name name = faker.name();
+        return new Customer(name.firstName(), name.lastName(), customerId, creditCard);
+    }
+
     public static List<Customer> generateCustomers(int numberCustomers) {
         List<Customer> customers = new ArrayList<>(numberCustomers);
         Faker faker = new Faker();
@@ -275,6 +306,15 @@ public class DataGenerator {
         }
 
         return stores;
+    }
+
+    private static Store electronicStore() {
+        Faker faker = new Faker();
+        String department = "Electronics";
+        String employeeId = Long.toString(faker.number().randomNumber(5, false));
+        String zipCode = faker.options().option("47197-9482", "97666", "113469", "334457");
+        String storeId = Long.toString(faker.number().randomNumber(6, true));
+        return new Store(employeeId, zipCode, storeId, department);
     }
 
 

@@ -20,4 +20,14 @@ public class PurchaseTestController {
         kafkaTemplate.send("transaction", null, DataGenerator.generatePurchase());
     }
 
+    @PostMapping("/coffee")
+    public void createCoffeePurchase() {
+        kafkaTemplate.send("transaction", null, DataGenerator.generateCoffeePurchase("customerId"));
+    }
+
+    @PostMapping("/electronics")
+    public void createElectronicsPurchase() {
+        kafkaTemplate.send("transaction", null, DataGenerator.generateElectronicPurchase("customerId"));
+    }
+
 }
