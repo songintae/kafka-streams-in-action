@@ -6,7 +6,7 @@ spring:
     producer:
       acks: 1
       batch-size: 1000000
-      key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.springframework.kafka.support.serializer.StringOrBytesSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         linger.ms: 100
@@ -16,7 +16,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: kafkaStreamsYellingApp;zMartStreamApplication;zMartStreamsJoinsApplication
+        definition: kafkaStreamsYellingApp;zMartStreamApplication;zMartStreamsJoinsApplication;kStreamsVsKTableApplication
       bindings:
         # KafkaStreams Bindings inbound consumer에 useNativeDecoding을 사용할 때 주의해야한다.
         # useNativeDecoding 설정 또는 KStreamBoundElementFactory.createInput의 분기 전을 통해 useNativeDecoding이 결정되는데, default값은 true이다.
@@ -35,6 +35,10 @@ spring:
           destination: coffee
         zMartStreamsJoinsApplication-in-1:
           destination: electronics
+        kStreamsVsKTableApplication-in-0:
+          destination: stock-ticker-stream
+        kStreamsVsKTableApplication-in-1:
+          destination: stock-ticker-table
       kafka:
         streams:
           binder:
@@ -45,6 +49,10 @@ spring:
                 applicationId: zMartStreamApplication
               zMartStreamsJoinsApplication:
                 applicationId: zMartStreamsJoinsApplication
+                configuration:
+                  num.stream.threads: 1
+              kStreamsVsKTableApplication:
+                applicationId: kStreamsVsKTableApplication
                 configuration:
                   num.stream.threads: 1
             configuration:
@@ -79,6 +87,15 @@ spring:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: com.example.kafkastreamsinaction.serde.PurchaseSerde
                 timestampExtractorBeanName: transactionTimestampExtractor
+            kStreamsVsKTableApplication-in-0:
+              consumer:
+                keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                valueSerde: com.example.kafkastreamsinaction.serde.StockTickerDataSerde
+            kStreamsVsKTableApplication-in-1:
+              consumer:
+                keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                valueSerde: com.example.kafkastreamsinaction.serde.StockTickerDataSerde
+                materializedAs: stock-ticker-store
 
 management:
   endpoints:

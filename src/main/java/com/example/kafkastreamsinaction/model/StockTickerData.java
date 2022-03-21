@@ -14,6 +14,9 @@ public class StockTickerData {
         return symbol;
     }
 
+    private StockTickerData() {
+    }
+
     public StockTickerData(double price, String symbol) {
         this.price = price;
         this.symbol = symbol;

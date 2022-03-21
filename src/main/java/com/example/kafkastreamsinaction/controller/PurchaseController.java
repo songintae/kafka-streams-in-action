@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/purchases")
 @RequiredArgsConstructor
-public class PurchaseTestController {
+public class PurchaseController {
 
     private final KafkaTemplate<String, Purchase> kafkaTemplate;
 
