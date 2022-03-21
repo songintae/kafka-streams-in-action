@@ -31,7 +31,7 @@ public class StockTickerController {
     }
 
     @GetMapping("/symbols")
-    public List<StockTickerData> getPric(@PathVariable String symbol) {
+    public List<StockTickerData> getPrice() {
         ReadOnlyKeyValueStore<String, StockTickerData> queryableStore = interactiveQueryService.getQueryableStore("stock-ticker-store", QueryableStoreTypes.<String, StockTickerData>keyValueStore());
 
         List<StockTickerData> result = new ArrayList<>();
