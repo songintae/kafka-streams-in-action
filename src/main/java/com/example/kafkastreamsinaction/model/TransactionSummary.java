@@ -13,6 +13,9 @@ public class TransactionSummary {
     private String customerName;
     private String companyName;
 
+    private TransactionSummary() {
+    }
+
 
     public TransactionSummary(String customerId, String stockTicker, String industry) {
         this.customerId = customerId;
@@ -49,7 +52,7 @@ public class TransactionSummary {
         return this;
     }
 
-    public String getCompmanyName() {
+    public String getCompanyName() {
         return companyName;
     }
 

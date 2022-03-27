@@ -27,7 +27,6 @@ public class AggregationAndReducingApplicationConfiguration {
     private static final Serde<String> stringSerde = Serdes.String();
     private static final Serde<ShareVolume> shareVolumeSerde = new ShareVolumeSerde();
     private static final FixedSizePriorityShareVolumeAggregatorSerde fixedSizePriorityQueueSerde = new FixedSizePriorityShareVolumeAggregatorSerde();
-    private static final Comparator<ShareVolume> comparator = (sv1, sv2) -> sv2.getShares() - sv1.getShares();
     private static final NumberFormat numberFormat = NumberFormat.getInstance();
 
 
@@ -55,7 +54,7 @@ public class AggregationAndReducingApplicationConfiguration {
             };
             shareVolume
                     .groupBy((key, value) -> KeyValue.pair(value.getIndustry(), value), Grouped.with(stringSerde, shareVolumeSerde))
-                    .aggregate(() -> new FixedSizePriorityShareVolumeAggregator(comparator, 5),
+                    .aggregate(() -> new FixedSizePriorityShareVolumeAggregator(5),
                             (key, value, aggregate) -> aggregate.add(value),
                             (key, value, aggregate) -> aggregate.remove(value),
                             Materialized.<String, FixedSizePriorityShareVolumeAggregator, KeyValueStore<Bytes, byte[]>>as("industry-priority-share-volume-store")
