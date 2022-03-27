@@ -16,7 +16,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: kafkaStreamsYellingApp;zMartStreamApplication;zMartStreamsJoinsApplication;kStreamsVsKTableApplication
+        definition: kafkaStreamsYellingApp;zMartStreamApplication;zMartStreamsJoinsApplication;kStreamsVsKTableApplication;aggregationAndReducingApplication
       bindings:
         # KafkaStreams Bindings inbound consumer에 useNativeDecoding을 사용할 때 주의해야한다.
         # useNativeDecoding 설정 또는 KStreamBoundElementFactory.createInput의 분기 전을 통해 useNativeDecoding이 결정되는데, default값은 true이다.
@@ -39,6 +39,8 @@ spring:
           destination: stock-ticker-stream
         kStreamsVsKTableApplication-in-1:
           destination: stock-ticker-table
+        aggregationAndReducingApplication-in-0:
+          destination: stock-transaction
       kafka:
         streams:
           binder:
@@ -55,6 +57,8 @@ spring:
                 applicationId: kStreamsVsKTableApplication
                 configuration:
                   num.stream.threads: 1
+              aggregationAndReducingApplication:
+                applicationId: aggregationAndReducingApplication
             configuration:
               replication.factor: 1
               default:
@@ -96,6 +100,11 @@ spring:
                 keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
                 valueSerde: com.example.kafkastreamsinaction.serde.StockTickerDataSerde
                 materializedAs: stock-ticker-store
+            aggregationAndReducingApplication-in-0:
+              consumer:
+                keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                valueSerde: com.example.kafkastreamsinaction.serde.StockTransactionSerde
+
 
 management:
   endpoints:
