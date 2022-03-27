@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 @Configuration
 public class AggregationAndReducingApplicationConfiguration {
     private static final Serde<String> stringSerde = Serdes.String();
-    private static final ShareVolumeSerde shareVolumeSerde = new ShareVolumeSerde();
+    private static final Serde<ShareVolume> shareVolumeSerde = new ShareVolumeSerde();
     private static final FixedSizePriorityShareVolumeAggregatorSerde fixedSizePriorityQueueSerde = new FixedSizePriorityShareVolumeAggregatorSerde();
     private static final Comparator<ShareVolume> comparator = (sv1, sv2) -> sv2.getShares() - sv1.getShares();
     private static final NumberFormat numberFormat = NumberFormat.getInstance();

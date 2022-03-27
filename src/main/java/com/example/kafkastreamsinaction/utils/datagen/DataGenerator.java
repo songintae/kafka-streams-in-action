@@ -153,6 +153,19 @@ public class DataGenerator {
         return generateStockTransactions(customers, companies, 1).get(0);
     }
 
+    public static StockTransaction generateStockTransaction(String customerId, String symbol) {
+        Customer customer = generateCustomersForInteractiveQueries().stream()
+                .filter(value -> value.customerId.equals(customerId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+
+        PublicTradedCompany publicTradedCompany = generatePublicTradedCompaniesForInteractiveQueries().stream()
+                .filter(value -> value.getSymbol().equals(symbol))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+        return generateStockTransactions(List.of(customer), List.of(publicTradedCompany), 1).get(0);
+    }
+
     public static List<StockTransaction> generateStockTransactions(List<Customer> customers, List<PublicTradedCompany> companies, int number) {
         List<StockTransaction> transactions = new ArrayList<>(number);
         Faker faker = new Faker();

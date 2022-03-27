@@ -1,6 +1,9 @@
 package com.example.kafkastreamsinaction.model;
 
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(of = {"customerId", "stockTicker"})
 public class TransactionSummary {
 
     private String customerId;
