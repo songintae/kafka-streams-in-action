@@ -9,6 +9,8 @@ public class ShareVolume {
     private int shares;
     private String industry;
 
+    private ShareVolume() {
+    }
 
     private ShareVolume(Builder builder) {
         symbol = builder.symbol;

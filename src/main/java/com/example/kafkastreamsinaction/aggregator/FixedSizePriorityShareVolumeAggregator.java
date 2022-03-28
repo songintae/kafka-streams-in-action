@@ -1,27 +1,33 @@
 package com.example.kafkastreamsinaction.aggregator;
 
 import com.example.kafkastreamsinaction.model.ShareVolume;
+import lombok.Getter;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
+@Getter
 public class FixedSizePriorityShareVolumeAggregator {
 
-    private final TreeSet<ShareVolume> inner;
-    private final int maxSize;
+    private List<ShareVolume> inner;
+    private int maxSize;
 
-    public FixedSizePriorityShareVolumeAggregator(Comparator<ShareVolume> comparator, int maxSize) {
-        this.inner = new TreeSet<>(comparator);
+    private FixedSizePriorityShareVolumeAggregator() {
+    }
+
+    public FixedSizePriorityShareVolumeAggregator(int maxSize) {
+        this.inner = new ArrayList<>();
         this.maxSize = maxSize;
     }
 
     public FixedSizePriorityShareVolumeAggregator add(ShareVolume element) {
         inner.add(element);
         if (inner.size() > maxSize) {
-            inner.pollLast();
+            final Optional<ShareVolume> minShare = inner.stream()
+                    .min(Comparator.comparing(ShareVolume::getShares));
+            minShare.ifPresent(v -> inner.remove(minShare.get()));
         }
 
+        inner.sort(Comparator.comparing(ShareVolume::getShares));
         return this;
     }
 

@@ -29,6 +29,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka-streams'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// arm arch를 지원하는 rocksdb로 변경
+	implementation 'org.rocksdb:rocksdbjni:7.0.3'
 
 	compileOnly 'org.projectlombok:lombok'
 	compileOnly(group: 'com.github.javafaker', name: 'javafaker', version: '0.12') {

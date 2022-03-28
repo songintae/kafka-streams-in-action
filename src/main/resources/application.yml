@@ -10,6 +10,8 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         linger.ms: 100
+    consumer:
+      auto-offset-reset: latest
 
   # Kafka Streams Binder에서는 Functional Style, mperative programming model 두가지 방식의 스트림 프로세서 Binder 기능을 제공한다.
   # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_programming_model
@@ -73,9 +75,6 @@ spring:
             # 해당 설정은 Application에 존재하는 모든 Stream Processor 에 적용되기 때문에 개별적으로 설정이 필요한 경우 따로 설정을 주어야한다.
             # https://docs.spring.io/spring-cloud-stream-binder-kafka/docs/3.2.1/reference/html/spring-cloud-stream-binder-kafka.html#_error_handling
             deserialization-exception-handler: logandfail
-          default:
-            consumer:
-              startOffset: latest
           bindings:
             kafkaStreamsYellingApp-in-0:
               consumer:

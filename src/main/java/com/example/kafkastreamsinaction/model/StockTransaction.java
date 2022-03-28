@@ -30,6 +30,9 @@ public class StockTransaction {
     private Date transactionTimestamp;
     private boolean purchase;
 
+    private StockTransaction() {
+    }
+
     private StockTransaction(Builder builder) {
         symbol = builder.symbol;
         sector = builder.sector;
