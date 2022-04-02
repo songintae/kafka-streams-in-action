@@ -18,6 +18,11 @@ public class CountingWindowingAndKTableJoinApplicationConfiguration {
     private final static Serde<StockTransaction> stockTransactionSerde = new StockTransactionSerde();
     private final static Serde<TransactionSummary> transactionSummarySerde = new TransactionSummarySerde();
 
+    /**
+     * TODO: Repartition 에서 가져온 데이터가 왜 Key에 다시 Value가 넘어오는지 확인 필요
+     *
+     * @return
+     */
     @Bean
     public Consumer<KStream<String, StockTransaction>> countingWindowingAndKTableJoinApplication() {
         return input -> {
